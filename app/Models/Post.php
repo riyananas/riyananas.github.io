@@ -2,56 +2,43 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-
-class Post
+class Post extends Model
 {
-    private static $blog_posts = [
-        [
-            "title" => "Judul Post Pertama",
-            "slug" => "judul-post-pertama",
-            "author" => "Riyan Anas Setiyawan",
-            "body" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Cras scelerisque congue sem, ac molestie ligula blandit at.
-In enim urna, posuere eget fermentum accumsan, finibus vitae tortor.
-Vivamus sed feugiat purus. 
-Vestibulum sit amet lectus efficitur, gravida lectus in, fringilla felis. 
-Pellentesque ultrices libero eget magna venenatis ornare. 
-Etiam ligula nulla, congue ac dolor id, interdum dignissim lectus. 
-Vestibulum vel ligula arcu. Nunc eget mollis nunc. 
-Proin ut varius erat. Morbi at condimentum sapien."
-        ],
-        [
-            "title" => "Judul Post Kedua",
-            "slug" => "judul-post-kedua",
-            "author" => "Rama Krniawan",
-            "body" => "Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-Cras scelerisque congue sem, ac molestie ligula blandit at.
-In enim urna, posuere eget fermentum accumsan, finibus vitae tortor.
-Vivamus sed feugiat purus. 
-Vestibulum sit amet lectus efficitur, gravida lectus in, fringilla felis. 
-Pellentesque ultrices libero eget magna venenatis ornare. 
-Etiam ligula nulla, congue ac dolor id, interdum dignissim lectus. 
-Vestibulum vel ligula arcu. Nunc eget mollis nunc. 
-Proin ut varius erat. Morbi at condimentum sapien.
+    use HasFactory;
+    protected $guarded = ['id'];
+    protected $with = ['category', 'author'];
 
-Quisque vehicula imperdiet leo nec facilisis.
-Nam et ante nec tellus rhoncus efficitur vitae in ligula.
-Nam viverra a libero nec porta.
-Sed a turpis quis eros pharetra fermentum in ac sapien.
-Curabitur fringilla interdum leo, nec varius est feugiat id.
-Quisque massa ante, dictum in tellus nec, gravida eleifend sem. 
-Cras in purus ut tortor tincidunt faucibus."
-        ]
-    ];
-
-    public static function all()
+    public function scopeFilter($query, array $filters)
     {
-        return collect(self::$blog_posts);
+        $query->when($filters['search'] ?? false, function ($query, $search) {
+            return $query->where('title', 'like', '%' . $search . '%')
+                ->orWhere('body', 'like', '%' . $search . '%');
+        });
+        $query->when($filters['category'] ?? false, function ($query, $category) {
+            return $query->whereHas('category', function ($query) use ($category) {
+                $query->where('slug', $category);
+            });
+        });
+        $query->when(
+            $filters['author'] ?? false,
+            fn ($query, $author) =>
+            $query->whereHas(
+                'author',
+                fn ($query) =>
+                $query->where('username', $author)
+            )
+        );
     }
-    public static function find($slug)
+
+    public function category()
     {
-        $posts = static::all();
-        return $posts->firstwhere('slug', $slug);
+        return $this->belongsTo(Category::class);
+    }
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
