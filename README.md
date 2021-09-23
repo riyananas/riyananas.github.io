@@ -17,6 +17,7 @@ Sahabat terbaik untuk kemajuan bisnis Anda, kami menyediakan layanan pembuatan w
 <br />
 
 [website]: https://gudangit.net
+[youtube]: https://youtube.com/chanel/UCKkzFk2FNmyNzAu1b1SQ9g
 [twitter]: https://twitter.com/GudangITNet
 [facebook]: https://facebook.com/GudangITdotNet
 [instagram]: https://instagram/gudangitdotnet
