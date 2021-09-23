@@ -1,10 +1,10 @@
-@extends('layouts.main')
+@extends('layouts/main')
 
 @section('container')
-<h1 class="mb-5 text-center">Post categories</h1>
 
 <div class="container">
-    <div class="row">
+    <div class="row my-5 py-5">
+        <h1 class="mb-5 text-center">Post categories</h1>
         @foreach ($categories as $category)
         <div class="col-md-4">
             <a href="/posts?category={{ $category->slug }}">
